@@ -1,2 +1,6 @@
+# Dir
 dist
 node_modules
+
+# Files
+.log

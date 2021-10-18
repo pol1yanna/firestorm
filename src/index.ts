@@ -1,4 +1,3 @@
-
 import { Collection, init } from './orm';
 
 export { Collection, init };

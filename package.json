@@ -5,17 +5,38 @@
   "author": "Vlad Rudzik <rudzhub>, Dmitry Dvornitsky <dinozav>",
   "license": "GNU AGPL",
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "commit": "git-cz",
+    "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix"
   },
   "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.1.0",
+    "@typescript-eslint/parser": "^5.1.0",
+    "eslint": "^7.32.0",
+    "eslint-config-airbnb-typescript": "^14.0.1",
+    "eslint-config-prettier": "^8.3.0",
+    "git-cz": "^4.8.0",
+    "prettier": "^2.4.1",
     "typescript": "^4.4.4"
   },
   "dependencies": {
-    "@google-cloud/firestore": "^4.15.1"
+    "@google-cloud/firestore": "^4.15.1",
+    "module-alias": "^2.2.2"
   },
   "main": "dist/index.js",
   "types": "dist/types/index.d.ts",
   "files": [
     "/dist"
-  ]
+  ],
+  "config": {
+    "commitizen": {
+      "path": "@commitlint/cz-commitlint"
+    }
+  },
+  "lint-staged": {
+    "*.{ts,js}": "eslint"
+  },
+  "_moduleAliases": {
+    "@": "./dist"
+  }
 }
