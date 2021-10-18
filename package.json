@@ -1,0 +1,21 @@
+{
+  "name": "firestorm",
+  "version": "1.0.0",
+  "repository": "https://github.com/finchonfire/firestorm.git",
+  "author": "Vlad Rudzik <rudzhub>, Dmitry Dvornitsky <dinozav>",
+  "license": "GNU AGPL",
+  "scripts": {
+    "build": "tsc"
+  },
+  "devDependencies": {
+    "typescript": "^4.4.4"
+  },
+  "dependencies": {
+    "@google-cloud/firestore": "^4.15.1"
+  },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "/dist"
+  ]
+}
