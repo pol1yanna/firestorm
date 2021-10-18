@@ -1,4 +1,5 @@
-import { Firestorm, GetStore, GetFirestore, InitializeFirestorm } from './config';
-import { Query } from './query';
 
-export { Firestorm, Query, GetStore, GetFirestore, InitializeFirestorm };
+import { Collection, init } from './orm';
+
+export { Collection, init };
+export default { Collection, init };

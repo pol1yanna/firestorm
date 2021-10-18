@@ -1,25 +1,17 @@
 export interface IFirestorm {
-    firestorm: Firestorm;
-}
-
-export class Firestorm {
-    public firestore: FirebaseFirestore.Firestore | undefined;
-
-    constructor() {
-        this.firestore = undefined;
-    }
+    firestorm: { 
+        firestore: FirebaseFirestore.Firestore 
+    };
 }
 
 export function GetStore(): IFirestorm {
-    return global as never;
+    return global as unknown as IFirestorm;
 }
 
-export function InitializeFirestorm() {
+export function InitializeFirestorm(firestore: FirebaseFirestore.Firestore) {
     const store = GetStore();
 
-    if (!store.firestorm) {
-        store.firestorm = new Firestorm();
-    }
+    store.firestorm = { firestore };
 }
 
 export function GetFirestore() {

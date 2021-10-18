@@ -3,7 +3,7 @@ import { GetStore, InitializeFirestorm } from './config';
 import { IQuery } from '../types/query';
 import { RecursivePartial } from '../types/utils';
 
-class Collection<Document> {
+export class Collection<Document> {
     private Query: Query<Document>;
 
     constructor(collectionName: string) {
@@ -109,15 +109,10 @@ class Collection<Document> {
     }
 }
 
-function init(firestore: FirebaseFirestore.Firestore) {
-    InitializeFirestorm();
+export function init(firestore: FirebaseFirestore.Firestore) {
+    InitializeFirestorm(firestore);
 
     const { firestorm } = GetStore();
 
     firestorm.firestore = firestore;
 }
-
-export const firestorm = {
-    Collection,
-    init,
-};
