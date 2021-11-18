@@ -18,7 +18,7 @@ export class Query<Document> {
     this.QueryUtils = new QueryUtils();
   }
 
-  private async _GetDocuments(
+  private async _getDocuments(
     queries: IQuery.Query<Document>[],
     options: IQuery.Options = { meta: false },
   ) {
@@ -75,11 +75,11 @@ export class Query<Document> {
     return meta;
   }
 
-  async Delete(id: string) {
+  async delete(id: string) {
     return this.Collection.doc(id).delete();
   }
 
-  async FindById(id: string, options: IQuery.Options = { meta: false }) {
+  async findById(id: string, options: IQuery.Options = { meta: false }) {
     const document = await this.Collection.doc(id).get();
 
     if (!document.exists) return undefined;
@@ -96,17 +96,17 @@ export class Query<Document> {
     return doc;
   }
 
-  async Update(id: string, data: RecursivePartial<Document>) {
+  async update(id: string, data: RecursivePartial<Document>) {
     return this.Collection.doc(id).set(data, { merge: true });
   }
 
-  async Find(
-    query: IQuery.NestedFieldQuery<Document>,
+  async find(
+    query?: IQuery.NestedFieldQuery<Document>,
     options?: IQuery.Options,
   ) {
-    const queries = this.QueryUtils.GetQueries(query);
+    const queries = this.QueryUtils.getQueries(query);
 
-    const documents = this._GetDocuments(queries, options);
+    const documents = this._getDocuments(queries, options);
 
     return documents;
   }

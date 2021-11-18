@@ -4,23 +4,36 @@ import { IQuery } from '../types/query';
 import { RecursivePartial } from '../types/utils';
 
 export class Collection<Document> {
-  private Query: Query<Document>;
+  private _Query: Query<Document>;
 
   constructor(collectionName: string) {
-    this.Query = new Query(collectionName);
+    this._Query = new Query(collectionName);
   }
 
-  async add(data: Document) {
-    const { id } = this.Query.Collection.doc();
+  getNextId() {
+    return this._IdGenerator.generateId();
+  }
 
-    await this.Query.Collection.doc(id).set({ ...data, id }, { merge: true });
+  async add(data: Omit<Document, 'id'>, customId?: string) {
+    const id = customId || this._IdGenerator.getId() || this._IdGenerator.generateId();
+
+    const dataToAdd = {
+      ...data,
+      id,
+    };
+
+    await this._Query.Collection.doc(dataToAdd.id).set(dataToAdd, { merge: true });
+
+    this._IdGenerator.resetId();
+
+    return dataToAdd;
   }
 
   async findOne(
-    query: IQuery.NestedFieldQuery<Document>,
+    query?: IQuery.NestedFieldQuery<Document>,
     options?: IQuery.Options,
   ) {
-    const documents = await this.Query.Find(query, options);
+    const documents = await this._Query.find(query, options);
 
     if (!documents.length) return undefined;
 
@@ -30,50 +43,50 @@ export class Collection<Document> {
   }
 
   async findById(id: string, options?: IQuery.Options) {
-    const document = await this.Query.FindById(id, options);
+    const document = await this._Query.findById(id, options);
 
     return document;
   }
 
   async findMany(
-    query: IQuery.NestedFieldQuery<Document>,
+    query?: IQuery.NestedFieldQuery<Document>,
     options?: IQuery.Options,
   ) {
-    const documents = await this.Query.Find(query, options);
+    const documents = await this._Query.find(query, options);
 
     if (!documents.length) return undefined;
 
     return documents;
   }
 
-  async deleteOne(query: IQuery.NestedFieldQuery<Document>) {
-    const documents = await this.Query.Find(query);
+  async deleteOne(query?: IQuery.NestedFieldQuery<Document>) {
+    const documents = await this._Query.find(query);
 
     if (!documents.length) return undefined;
 
     const [document] = documents;
 
-    await this.Query.Delete(document.id);
+    await this._Query.delete(document.id);
 
     return document;
   }
 
   async deleteById(id: string) {
-    const document = await this.Query.FindById(id);
+    const document = await this._Query.findById(id);
 
     if (!document) return undefined;
 
-    await this.Query.Delete(document.id);
+    await this._Query.delete(document.id);
 
     return document;
   }
 
-  async deleteMany(query: IQuery.NestedFieldQuery<Document>) {
-    const documents = await this.Query.Find(query);
+  async deleteMany(query?: IQuery.NestedFieldQuery<Document>) {
+    const documents = await this._Query.find(query);
 
     if (!documents.length) return { count: 0 };
 
-    const deletePromise = documents.map((document) => this.Query.Delete(document.id));
+    const deletePromise = documents.map((document) => this._Query.delete(document.id));
 
     await Promise.all(deletePromise);
 
@@ -84,16 +97,16 @@ export class Collection<Document> {
     query,
     data,
   }: {
-    query: IQuery.NestedFieldQuery<Document>;
+    query?: IQuery.NestedFieldQuery<Document>;
     data: RecursivePartial<Document>;
   }) {
-    const documents = await this.Query.Find(query);
+    const documents = await this._Query.find(query);
 
     if (!documents.length) return undefined;
 
     const [document] = documents;
 
-    await this.Query.Update(document.id, data);
+    await this._Query.update(document.id, data);
 
     return document;
   }
@@ -105,11 +118,11 @@ export class Collection<Document> {
     id: string;
     data: RecursivePartial<Document>;
   }) {
-    const document = await this.Query.FindById(id);
+    const document = await this._Query.findById(id);
 
     if (!document) return undefined;
 
-    await this.Query.Update(document.id, data);
+    await this._Query.update(document.id, data);
 
     return document;
   }
@@ -118,19 +131,44 @@ export class Collection<Document> {
     query,
     data,
   }: {
-    query: IQuery.NestedFieldQuery<Document>;
+    query?: IQuery.NestedFieldQuery<Document>;
     data: RecursivePartial<Document>;
   }) {
-    const documents = await this.Query.Find(query);
+    const documents = await this._Query.find(query);
 
     if (!documents.length) return { count: 0 };
 
-    const updatePromise = documents.map((document) => this.Query.Update(document.id, data));
+    const updatePromise = documents.map((document) => this._Query.update(document.id, data));
 
     await Promise.all(updatePromise);
 
     return { count: documents.length };
   }
+
+  private _IdGenerator = new class {
+    private nextId: null | string = null;
+
+    constructor(private parent: Collection<Document>) {}
+
+    generateId() {
+      const { id } = this.parent._Query.Collection.doc();
+      this.nextId = id;
+  
+      return id;
+    }
+
+    getId() {
+      const id = this.nextId;
+
+      this.nextId = null;
+
+      return id;
+    }
+
+    resetId() {
+      this.nextId = null;
+    }
+  }(this);
 }
 
 export function init(firestore: FirebaseFirestore.Firestore) {

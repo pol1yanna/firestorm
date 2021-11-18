@@ -38,8 +38,12 @@ export namespace IQuery {
         query?: Queries<Value>;
     }
 
+    export interface FieldQueries<Value> extends IQueries.Options {
+        queries?: Queries<Value>[];
+    }
+
     export type NestedFieldQuery<Document> = {
-        [Field in keyof Document]?: NestedFieldQuery<Document[Field]> | FieldQuery<Document[Field]>;
+        [Field in keyof Document]?: NestedFieldQuery<Document[Field]> | FieldQuery<Document[Field]> | FieldQueries<Document[Field]>;
     };
 
     export type FieldQueryOrNestedFieldQuery<Value> = NestedFieldQuery<Value> | FieldQuery<Value>;
