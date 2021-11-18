@@ -10,12 +10,14 @@ export class Collection<Document> {
     this._Query = new Query(collectionName);
   }
 
-  getNextId() {
-    return this._IdGenerator.generateId();
+  generateId() {
+    const { id } = this._Query.Collection.doc();
+
+    return id;
   }
 
   async add(data: Omit<Document, 'id'>, customId?: string) {
-    const id = customId || this._IdGenerator.getId() || this._IdGenerator.generateId();
+    const id = customId || this.generateId();
 
     const dataToAdd = {
       ...data,
@@ -23,8 +25,6 @@ export class Collection<Document> {
     };
 
     await this._Query.Collection.doc(dataToAdd.id).set(dataToAdd, { merge: true });
-
-    this._IdGenerator.resetId();
 
     return dataToAdd;
   }
@@ -144,31 +144,6 @@ export class Collection<Document> {
 
     return { count: documents.length };
   }
-
-  private _IdGenerator = new class {
-    private nextId: null | string = null;
-
-    constructor(private parent: Collection<Document>) {}
-
-    generateId() {
-      const { id } = this.parent._Query.Collection.doc();
-      this.nextId = id;
-  
-      return id;
-    }
-
-    getId() {
-      const id = this.nextId;
-
-      this.nextId = null;
-
-      return id;
-    }
-
-    resetId() {
-      this.nextId = null;
-    }
-  }(this);
 }
 
 export function init(firestore: FirebaseFirestore.Firestore) {
