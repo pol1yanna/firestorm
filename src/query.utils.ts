@@ -12,7 +12,7 @@ export class QueryUtils<Document> {
         IQuery.NestedFieldQuery<Document>,
       ];
 
-      const fieldQueries = this._getQuery(value, field);
+      const fieldQueries = this._getQueries(value, field);
 
       if (fieldQueries) {
         queries.push(...fieldQueries);
@@ -22,7 +22,7 @@ export class QueryUtils<Document> {
     return queries;
   }
 
-  private _getNestedQuery(
+  private _getNestedQueries(
     object: IQuery.NestedFieldQuery<Document>,
     parent?: string,
   ): IQuery.Query<Document>[] | undefined {
@@ -31,7 +31,7 @@ export class QueryUtils<Document> {
 
       field = parent ? `${parent}.${field}` : field;
 
-      return this._getQuery(value, field);
+      return this._getQueries(value, field);
     }
   }
 
@@ -39,7 +39,7 @@ export class QueryUtils<Document> {
     return !!(value as IQuery.FieldQuery<Document>).query || !!(value as IQuery.FieldQueries<Document>).queries || !!value.orderBy || !!value.orderByDirection;
   }
 
-  private _getQuery(value: IQuery.NestedFieldQuery<Document>, field: string) {
+  private _getQueries(value: IQuery.NestedFieldQuery<Document>, field: string) {
     const isQuery = this._isQuery(value);
 
     if (isQuery) {
@@ -62,6 +62,6 @@ export class QueryUtils<Document> {
       return [query];
     }
 
-    return this._getNestedQuery(value, field);
+    return this._getNestedQueries(value, field);
   }
 }
