@@ -1,21 +1,17 @@
-import { Firestore, CollectionReference } from '@google-cloud/firestore';
-import { GetFirestore } from './config';
+import { CollectionReference } from '@google-cloud/firestore';
 import { QueryUtils } from './query.utils';
 
 import { IQuery } from '../types/query';
 import { RecursivePartial } from '../types/utils';
 
 export class Query<Document> {
-  Firestore: Firestore;
-
   Collection: CollectionReference;
 
-  QueryUtils: QueryUtils<Document>;
+  private _QueryUtils: QueryUtils<Document>;
 
-  constructor(collection: string) {
-    this.Firestore = GetFirestore();
-    this.Collection = this.Firestore.collection(collection);
-    this.QueryUtils = new QueryUtils();
+  constructor(Collection: CollectionReference) {
+    this.Collection = Collection;
+    this._QueryUtils = new QueryUtils();
   }
 
   private async _getDocuments(
@@ -104,7 +100,7 @@ export class Query<Document> {
     query?: IQuery.NestedFieldQuery<Document>,
     options?: IQuery.Options,
   ) {
-    const queries = this.QueryUtils.getQueries(query);
+    const queries = this._QueryUtils.getQueries(query);
 
     const documents = this._getDocuments(queries, options);
 

@@ -2,12 +2,18 @@ import { Query } from './query';
 import { GetStore, InitializeFirestorm } from './config';
 import { IQuery } from '../types/query';
 import { RecursivePartial } from '../types/utils';
+import { GetFirestore } from './config';
+import { Batch } from './batch';
 
 export class Collection<Document> {
+  Batch: Batch<Document>;
+
   private _Query: Query<Document>;
 
   constructor(collectionName: string) {
-    this._Query = new Query(collectionName);
+    const collection = GetFirestore().collection(collectionName);
+    this.Batch = new Batch(collection);
+    this._Query = new Query(collection);
   }
 
   generateId() {
