@@ -43,14 +43,12 @@ export class QueryUtils<Document> {
     const isQuery = this._isQuery(value);
 
     if (isQuery) {
-      const queriesValue = value as IQuery.FieldQueries<Document>;
-      if(queriesValue.queries) {
-        const queries = queriesValue.queries!.map((query: IQuery.Queries<Document>) => {
-          return  {
+      const queriesValue = (value as IQuery.FieldQueries<Document>).queries;
+      if(queriesValue) {
+        const queries = queriesValue.map(query => ({
             field,
             query,
-          }
-        });
+        }));
 
         return queries;
       }

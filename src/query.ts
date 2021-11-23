@@ -34,6 +34,9 @@ export class Query<Document> {
       }
     });
 
+    if (options.startAfter)
+      collection = collection.startAfter(options.startAfter);
+
     if (options.limit) collection = collection.limit(options.limit);
 
     const documents = (await collection.get()).docs;

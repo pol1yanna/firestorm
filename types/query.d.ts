@@ -5,6 +5,7 @@ export namespace IQuery {
     export type Options = {
         meta?: boolean;
         limit?: number;
+        startAfter?: FirebaseFirestore.DocumentSnapshot;
     };
 
     export interface DocumentExtend {
