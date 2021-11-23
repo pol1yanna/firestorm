@@ -36,29 +36,32 @@ export class QueryUtils<Document> {
   }
 
   private _isQuery(value: IQuery.FieldQuery<Document> | IQuery.FieldQueries<Document>): boolean {
-    return !!(value as IQuery.FieldQuery<Document>).query || !!(value as IQuery.FieldQueries<Document>).queries || !!value.orderBy || !!value.orderByDirection;
+    const hasQuery = !!(value as IQuery.FieldQuery<Document>).query;
+    const hasQueries = !!(value as IQuery.FieldQueries<Document>).queries;
+
+    return hasQuery || hasQueries || !!value.orderBy || !!value.orderByDirection;
   }
 
   private _getQueries(value: IQuery.NestedFieldQuery<Document>, field: string) {
     const isQuery = this._isQuery(value);
 
     if (isQuery) {
-      const queriesValue = (value as IQuery.FieldQueries<Document>).queries;
-      if(queriesValue) {
-        const queries = queriesValue.map(query => ({
+      const { queries } = (value as IQuery.FieldQueries<Document>);
+      if(queries) {
+        const fieldQueries = queries.map(query => ({
             field,
             query,
         }));
 
-        return queries;
+        return fieldQueries;
       }
 
-      const query: IQuery.Query<Document> = {
+      const fieldQuery: IQuery.Query<Document> = {
         field,
         ...(value as IQuery.FieldQuery<Document>),
       };
 
-      return [query];
+      return [fieldQuery];
     }
 
     return this._getNestedQueries(value, field);
